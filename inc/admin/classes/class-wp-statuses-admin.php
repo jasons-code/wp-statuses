@@ -582,13 +582,21 @@ class WP_Statuses_Admin {
 			$date = date_i18n( $datef, strtotime( current_time( 'mysql' ) ) );
 		}
 
-		if ( ! empty( $args['args']['revisions_count'] ) ) : ?>
+		$revisions = wp_get_post_revisions( $post );
+		if ( is_wp_error( $revisions ) || empty( $revisions ) ) {
+		  $revisions_count = 0;
+		} else {
+		  $revisions_count = count( $revisions );
+		  $revisions_first = reset( $revisions );
+		}
+
+		if ( ! empty( $revisions_count ) ) : ?>
 			<div class="misc-pub-section misc-pub-revisions">
 				<?php
 					/* translators: Post revisions heading. 1: The number of available revisions */
-					printf( __( 'Revisions: %s', 'wp-statuses' ), '<b>' . number_format_i18n( $args['args']['revisions_count'] ) . '</b>' );
+					printf( __( 'Revisions: %s', 'wp-statuses' ), '<b>' . number_format_i18n( $revisions_count ) . '</b>' );
 				?>
-				<a class="hide-if-no-js" href="<?php echo esc_url( get_edit_post_link( $args['args']['revision_id'] ) ); ?>">
+				<a class="hide-if-no-js" href="<?php echo esc_url( get_edit_post_link( $revisions_first ) ); ?>">
 					<span aria-hidden="true"><?php echo esc_html_x( 'Browse', 'revisions', 'wp-statuses' ); ?></span>
 					<span class="screen-reader-text"><?php esc_html_e( 'Browse revisions', 'wp-statuses' ); ?></span>
 				</a>
